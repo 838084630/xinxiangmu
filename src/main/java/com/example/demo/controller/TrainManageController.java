@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.swing.plaf.PanelUI;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +54,7 @@ public class TrainManageController {
 
     }
 
+//    下拉框1
     @RequestMapping("/xx")
     @ResponseBody
     public List<TrainInfo> options(){
@@ -60,6 +62,7 @@ public class TrainManageController {
 
         return trainInfoList;
     }
+//    下拉框2
     @RequestMapping("/xx2")
     @ResponseBody
     public List<TrainInfo> options2(){
@@ -72,8 +75,9 @@ public class TrainManageController {
 @RequestMapping("/addLesson")
 @ResponseBody
 public Map addLesson(String subjects, String departmentName, String empname, String period, String trainTypeName){
-    Date riqi = new Date();
-    String date = String.valueOf(riqi);
+
+    String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
 ////    查培训主表根据培训类名获取类名id，便于创建新的公告，先创建实体类
 //    trainManageService.queryTrainType(trainTypeName);
 //    get方法获取id
@@ -83,14 +87,20 @@ public Map addLesson(String subjects, String departmentName, String empname, Str
     trainInfo.setUpdateDate(date);
     trainInfo.setTrainTypeName(trainTypeName);
     trainInfo.setDirector(empname);
+
+//    trainInfo.setTrainType("");
+//    trainInfo.setDirector("");
+//    trainInfo.setGoal("");
+//    trainInfo.setDescription("");
+//    trainInfo.setStatus("");
+//    trainInfo.setCreateId(0);
+//    trainInfo.setUpdateId(0);
+//    trainInfo.setTrainId(2);
+
     TrainInfo result = trainManageService.saveTrainInfo(trainInfo);
     HashMap<String, Object> map = new HashMap<>();
-    if (result.getSubjects()==subjects && result.getPeriod()==period &&
-            result.getUpdateDate()==date && result.getTrainTypeName() ==trainTypeName &&
-            result.getDirector()==empname){
             return (Map) map.put("code","200");
-    }
-    return (Map) map.put("code","400");
+
 }
 
 }

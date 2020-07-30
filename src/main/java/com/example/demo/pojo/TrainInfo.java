@@ -22,7 +22,7 @@ public class TrainInfo {
     @Column(name = "director")
     private String director;
     @Column(name = "goal")
-    private int goal;
+    private String goal;
     @Column(name = "description")
     private String description;
     @Column(name = "period")

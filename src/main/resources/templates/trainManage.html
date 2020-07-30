@@ -4,25 +4,33 @@
     <meta charset="UTF-8">
     <title>培训管理&培训检索</title>
     <link rel="stylesheet" href="../static/css/bootstrap.css">
-    <link rel="stylesheet" href="../static/css/bootstrap-theme.css">
+    <!--<link rel="stylesheet" href="../static/css/bootstrap-theme.css">-->
     <script src="../static/js/jquery-3.4.1.js"></script>
     <script src="../static/js/bootstrap.js"></script>
     <link rel="stylesheet" href="../static/css/bootstrap-table.min.css">
     <script src="../static/js/bootstrap-table.min.js"></script>
+    <style>
+        a{
+            padding: 5px;
+            font-size: 20px;
+        }
+        .btn{font-size: 15px;
+        }
+    </style>
 </head>
 <body>
 <ul class="nav nav-tabs">
-    <li role="presentation" class="active"><a href="#" onclick="showDiv1()">培训管理</a></li>
-    <li role="presentation"><a href="#" onclick="showDiv2()">培训明细</a></li>
-    <li role="presentation"><a href="#" onclick="showDiv3()">培训人员明细</a></li>
-    <li role="presentation"><a href="#" onclick="showDiv4()">课程内容更新</a></li>
-    <li role="presentation"><a href="#" onclick="showDiv5()">培训人员追加</a></li>
-    <li role="presentation"><a href="#" onclick="showDiv6()">报名检索</a></li>
+    <li role="presentation" class="active"><span><span class="glyphicon glyphicon-th-large" aria-hidden="true"></span><a href="#" onclick="showDiv1()">培训管理</a></span></li>
+    <li role="presentation"><span><span class="glyphicon glyphicon-th-large" aria-hidden="true"></span><a href="#" onclick="showDiv2()">培训明细</a></span></li>
+    <li role="presentation"><span><span class="glyphicon glyphicon-align-center" aria-hidden="true"></span><a href="#" onclick="showDiv3()">培训人员明细</a></span></li>
+    <li role="presentation"><span><span class="glyphicon glyphicon-edit" aria-hidden="true"></span><a href="#" onclick="showDiv4()">课程内容更新</a></span></li>
+    <li role="presentation"><span><span class="glyphicon glyphicon-user" aria-hidden="true"></span><a href="#" onclick="showDiv5()">培训人员追加</a></span></li>
+    <li role="presentation"><span><span class="glyphicon glyphicon-search" aria-hidden="true"></span><a href="#" onclick="showDiv6()">报名检索</a></span></li>
 </ul>
 <!--div1-->
 <div>
 <div id="div1">
-    <h3>培训管理&培训检索</h3>
+    <h3>培训管理/培训检索</h3>
     <div>
         <label style="display:inline;">培训状态：</label>
         <select class="combobox" style="width: 100px">
@@ -46,8 +54,8 @@
         <select class="selectpicker" data-live-search="true" name="addid" id="addid" style="width: 100px"></select>
     </div>
 
-    <button id="search">检索</button>
-    <button id="add">追加</button>
+    <button id="search" class="btn btn-primary glyphicon glyphicon-search">检索</button>
+    <button id="add" class="btn btn-success glyphicon glyphicon-edit">追加</button>
 
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
@@ -88,10 +96,10 @@
 
 <!--div2-->
 <div id="div2" style="display: none">
-    <h3>培训管理</h3>
-    <button id="denglu">登録</button>
-    <button id="shanchu">删除</button>
-    <button id="fanhui">返回</button>
+    <h3>培训管理/培训明细</h3>
+    <button id="denglu" class="btn btn-success">登録</button>
+    <button id="shanchu" class="btn btn-danger">删除</button>
+    <button id="fanhui" class="btn btn-warning">返回</button>
     <div>
         <label style="display:inline;">课程名称：</label>
         <input type="text" class="form-control" id="lessonName" style="display:inline;width:200px;" autocomplete="off"/></br>
@@ -107,7 +115,31 @@
     </div>
 </div>
 <!--div3-->
-<div id="div3" style="display: none">div3</div>
+<div id="div3" style="display: none">
+    <h3>培训管理/培训人员明细</h3>
+    <button class="btn btn-warning">返回</button>
+    <div>
+
+        <button class="btn btn-danger">删除</button>
+        <button class="btn btn-info">追加</button>
+    </div>
+    <table class="table table-hover table-bordered" id="empTable">
+        <tr>
+            <th><button class="selectAll">全选</button></th>
+            <th>姓名</th>
+            <th>部门</th>
+            <th>职务</th>
+        </tr>
+        <tr th:each="data:${empAndDep}">
+            <td><input type="checkbox"></td>
+            <td th:text="${data.getEmp().getEmpId()}"></td>
+            <td th:text="${data.getDep().getDepName()}"></td>
+            <td th:text="${data.getEmp().getRole()}"></td>
+        </tr>
+
+    </table>
+    <button id="aaa">点我</button>
+</div>
 <!--div4-->
 <div id="div4" style="display: none">div4</div>
 <!--div5-->
@@ -117,6 +149,14 @@
 
 </body>
 <script>
+    $("#aaa").click(function () {
+        $.ajax({
+            url:"/empNum",
+            success:function () {
+
+            }
+        })
+    })
 
     //授课类型的动态下拉框
     $.ajax({
@@ -141,7 +181,7 @@
         var statusOption = $(".combobox option:selected").val();
         var trainData = $("#trainDate").val();
         var lessonOption = $(".selectpicker option:selected").text();
-        alert(statusOption+lessonOption);
+
         $.ajax({
             url: "/searchByConditions",
             data:{
@@ -223,6 +263,11 @@
     });
 
 
+    $(".selectAll").click(function() {
+        //3.1获取到所有的CheckBox
+        var checks = $(":checkBox");
+        checks.prop("checked", true);
+    })
 
     function showDiv1() {
         document.getElementById("div1").style.display="block";

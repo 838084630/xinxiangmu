@@ -15,7 +15,7 @@ public interface TrainManageDao extends JpaRepository<TrainInfo,Integer> {
 //    @Query(value = "select * from train_info where status = ?1 and start_date = ?2 and train_type_name = ?3", nativeQuery = true)
     List<TrainInfo> findByStatusAndStartDate(String statusOption, String trainData);
 
-    TrainInfo insertTrainfo(String subjects, String period, String trainTypeName, String date, String empname);
+//    TrainInfo insertTrainfo(String subjects, String period, String trainTypeName, String date, String empname);
 //    AndTrainTypeName
 
 }
