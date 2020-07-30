@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>培训管理&培训检索</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/bootstrap-theme.css">
+    <script src="../static/js/jquery-3.4.1.js"></script>
+    <script src="../static/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="../static/css/bootstrap-table.min.css">
+    <script src="../static/js/bootstrap-table.min.js"></script>
+</head>
+<body>
+<ul class="nav nav-tabs">
+    <li role="presentation" class="active"><a href="#" onclick="showDiv1()">培训管理</a></li>
+    <li role="presentation"><a href="#" onclick="showDiv2()">培训明细</a></li>
+    <li role="presentation"><a href="#" onclick="showDiv3()">培训人员明细</a></li>
+    <li role="presentation"><a href="#" onclick="showDiv4()">课程内容更新</a></li>
+    <li role="presentation"><a href="#" onclick="showDiv5()">培训人员追加</a></li>
+    <li role="presentation"><a href="#" onclick="showDiv6()">报名检索</a></li>
+</ul>
+<!--div1-->
+<div>
+<div id="div1">
+    <h3>培训管理&培训检索</h3>
+    <div>
+        <label style="display:inline;">培训状态：</label>
+        <select class="combobox" style="width: 100px">
+            <option value="0">未发布</option>
+            <option value="1">报名中</option>
+            <option value="2">确定</option>
+            <option value="3">完了</option>
+        </select>
+    </div>
+    <div>
+        <label style="display:inline;">培训实施日：</label>
+        <input type="text" class="form-control" id="trainDate" style="display:inline;width:200px;" autocomplete="off"/>
+    </div>
+    <br>
+    <!--<label style="display:inline;">授课类型：</label>-->
+    <!--<select name="ChanneltypeID" class="layui-select">-->
+        <!--<option th:each="trainInfo : ${trainInfoList}" th:value="${trainInfo.trainId}" th:text="${trainInfo.trainTypeName}">-->
+    <!--</select></br>-->
+    <div>
+    <label  style="display:inline;">授课类型：</label>
+        <select class="selectpicker" data-live-search="true" name="addid" id="addid" style="width: 100px"></select>
+    </div>
+
+    <button id="search">检索</button>
+    <button id="add">追加</button>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <table class="table table-hover table-bordered">
+
+                <thead>
+                <tr>
+                    <th>培训No</th>
+                    <th>培训名称</th>
+                    <th>实施日</th>
+                    <th>授课者</th>
+                    <th>培训状态</th>
+                    <th>计划人数</th>
+                    <th>确定人数</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="train : ${trainInfoList}">
+                    <td th:text="${train.trainType}"></td>
+                    <td th:text="${train.trainTypeName}"></td>
+                    <td th:text="${train.startDate}"></td>
+                    <td th:text="${train.period}"></td>
+                    <td th:text="${train.status}"></td>
+                    <td th:text="${train.joinNum}"></td>
+                    <td th:text="${train.joinNumtrue}"></td>
+                    <td><button class="btn btn-primary">操作</button></td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+</div>
+<!--</div>-->
+
+<!--div2-->
+<div id="div2" style="display: none">
+    <h3>培训管理</h3>
+    <button id="denglu">登録</button>
+    <button id="shanchu">删除</button>
+    <button id="fanhui">返回</button>
+    <div>
+        <label style="display:inline;">课程名称：</label>
+        <input type="text" class="form-control" id="lessonName" style="display:inline;width:200px;" autocomplete="off"/></br>
+        <label style="display:inline;">授课者部门：</label>
+        <input type="text" class="form-control" id="directorDep" style="display:inline;width:200px;" autocomplete="off"/></br>
+        <label style="display:inline;">授课者姓名：</label>
+        <input type="text" class="form-control" id="directorName" style="display:inline;width:200px;" autocomplete="off"/></br>
+        <label style="display:inline;">授课时段：</label>
+        <input type="text" class="form-control" id="lessonDate" style="display:inline;width:200px;" autocomplete="off"/></br>
+        <label  style="display:inline;">授课类型：</label>
+        <select class="selectpicker2" data-live-search="true" name="addid" id="addid2" style="width: 100px"></select>
+
+    </div>
+</div>
+<!--div3-->
+<div id="div3" style="display: none">div3</div>
+<!--div4-->
+<div id="div4" style="display: none">div4</div>
+<!--div5-->
+<div id="div5" style="display: none">div5</div>
+<!--div6-->
+<div id="div6" style="display: none">div6</div>
+
+</body>
+<script>
+
+    //授课类型的动态下拉框
+    $.ajax({
+        "url": "/xx",
+        "success": function (data) {
+            var opts = "";
+            for (var i=0;i<data.length;i++){
+
+                var values = data[i].trainId;
+                var text = data[i].trainTypeName;
+                $("#addid").append("<option value='"+values+"'>"+text+"</option>")
+            }
+            // $("#addid").append(opts);
+            // $("#addid").selectpicker("refresh");
+
+        }
+    });
+
+
+    // 培训检索
+    $("#search").click(function () {
+        var statusOption = $(".combobox option:selected").val();
+        var trainData = $("#trainDate").val();
+        var lessonOption = $(".selectpicker option:selected").text();
+        alert(statusOption+lessonOption);
+        $.ajax({
+            url: "/searchByConditions",
+            data:{
+                statusOption : statusOption,
+                  trainData : trainData,
+                lessonOption : lessonOption
+            },
+            success: function (data) {
+
+            }
+        })
+    })
+
+    // 增加培训
+    $("#add").click(function () {
+        showDiv2();
+        // $.ajax({
+        //     url:"/addNewLesson",
+        //     success:function (data) {
+        //
+        //     }
+        // })
+        $.ajax({
+            "url": "/xx2",
+            "success": function (data) {
+                var opts = "";
+                for (var i=0;i<data.length;i++){
+
+                    var values = data[i].trainId;
+                    var text = data[i].trainTypeName;
+                    $("#addid2").append("<option value='"+values+"'>"+text+"</option>")
+                }
+                // $("#addid").append(opts);
+                // $("#addid").selectpicker("refresh");
+
+            }
+        });
+    });
+
+    //添加一个课程
+    $("#denglu").click(function () {
+        var lessonName = $("#lessonName").val();
+        var directorDep = $("#directorDep").val();
+        var directorName = $("#directorName").val();
+        var lessonDate = $("#lessonDate").val();
+        var selectValue = $(".selectpicker2 option:selected").text();
+        alert(lessonName+directorDep+directorName+lessonDate+selectValue);
+        //缺少非空判断
+        $.ajax({
+            url:"/addLesson",
+            data:{
+               subjects:lessonName,
+               departmentName:directorDep,
+               empname:directorName,
+               period:lessonDate,
+               trainTypeName:selectValue
+            },
+            success:function (data) {
+                if (data.code==200){
+                    alert("成功")
+                }else{
+                    alert("失败")
+                }
+            }
+        })
+    });
+
+    //清空添加课程时的输入框
+    $("#shanchu").click(function () {
+        $("#lessonName").val("");
+        $("#directorDep").val("");
+        $("#directorName").val("");
+        $("#lessonDate").val("");
+    });
+
+    //从新增课程页面返回
+    $("#fanhui").click(function () {
+        showDiv1();
+    });
+
+
+
+    function showDiv1() {
+        document.getElementById("div1").style.display="block";
+        document.getElementById("div2").style.display="none";
+        document.getElementById("div3").style.display="none";
+        document.getElementById("div4").style.display="none";
+        document.getElementById("div5").style.display="none";
+        document.getElementById("div6").style.display="none";
+
+
+    }
+
+
+    //使用bootstrap动态加载表格
+    // $('.table').bootstrapTable({
+    //     url: '/trainOptions',
+    //     pagination: true,
+    //     columns: [{
+    //         field: 'trainType',
+    //         title: '培训No.'
+    //     }, {
+    //         field: 'trainTypeName',
+    //         title: '培训名称'
+    //     }, {
+    //         field: 'startDate',
+    //         title: '实施日'
+    //     }, {
+    //     field: 'director',
+    //         title: '授课者'
+    //     }, {
+    //         field: 'status',
+    //         title: '培训状态'
+    //     }, {
+    //         field: 'joinNum',
+    //         title: '计划人数'
+    //     }, {
+    //         field: 'joinNumtrue',
+    //         title: '确认人数'
+    //     }
+    //     ,{
+    //         formatter:function (value,row) {
+    //             return `<button onclick='del(${row.id})' class='btn btn-danger'>操作</button>`;
+    //             // return "$"+row.price;
+    //         }
+    //     }
+    //
+    //     ]
+    // })
+
+    function showDiv2() {
+        document.getElementById("div2").style.display="block";
+        document.getElementById("div1").style.display="none";
+        document.getElementById("div3").style.display="none";
+        document.getElementById("div4").style.display="none";
+        document.getElementById("div5").style.display="none";
+        document.getElementById("div6").style.display="none";
+
+    }
+    function showDiv3() {
+        document.getElementById("div3").style.display="block";
+        document.getElementById("div1").style.display="none";
+        document.getElementById("div2").style.display="none";
+        document.getElementById("div4").style.display="none";
+        document.getElementById("div5").style.display="none";
+        document.getElementById("div6").style.display="none";
+
+    }
+    function showDiv4() {
+        document.getElementById("div4").style.display="block";
+        document.getElementById("div1").style.display="none";
+        document.getElementById("div2").style.display="none";
+        document.getElementById("div3").style.display="none";
+        document.getElementById("div5").style.display="none";
+        document.getElementById("div6").style.display="none";
+
+    }
+    function showDiv5() {
+        document.getElementById("div5").style.display="block";
+        document.getElementById("div2").style.display="none";
+        document.getElementById("div2").style.display="none";
+        document.getElementById("div3").style.display="none";
+        document.getElementById("div4").style.display="none";
+        document.getElementById("div6").style.display="none";
+
+    }
+    function showDiv6() {
+        document.getElementById("div6").style.display="block";
+        document.getElementById("div1").style.display="none";
+        document.getElementById("div2").style.display="none";
+        document.getElementById("div3").style.display="none";
+        document.getElementById("div4").style.display="none";
+        document.getElementById("div5").style.display="none";
+
+
+    }
+
+
+</script>
+</html>

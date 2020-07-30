@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
+import com.example.demo.pojo.Admin;
+
 public interface LoginService {
 
-    int findByAdminname(String managerUsername, Integer managerPassword);
+    Admin findByAdminNameAndAdminPass(String adminName, String adminPass);
 }

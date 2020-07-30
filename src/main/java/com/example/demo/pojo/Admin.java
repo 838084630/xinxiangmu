@@ -4,18 +4,19 @@ import lombok.Data;
 
 import javax.persistence.*;
 
+@Data
 @Entity
 @Table(name = "admin")
-public class Manager {
+public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "admin_id")
-    private int managerId;
+    private Integer adminId;
     @Column(name = "admin_name")
-    private String managerUsername;
-    @Column(name = "admin_password")
-    private String managerPassword;
+    private String adminName;
+    @Column(name = "admin_pass")
+    private String adminPass;
 
 
 }
