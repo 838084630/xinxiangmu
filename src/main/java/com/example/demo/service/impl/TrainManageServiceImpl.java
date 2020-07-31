@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dao.TrainManageDao;
+import com.example.demo.pojo.Train;
 import com.example.demo.pojo.TrainInfo;
 import com.example.demo.service.TrainManageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,13 @@ public class TrainManageServiceImpl implements TrainManageService {
 
     @Override
     public List<TrainInfo> findOptions() {
-        return trainManageDao.findAllTrainInfo();
+        return trainManageDao.findOptions();
     }
 
+//    下拉框
+    public List<Train> findPullDownMenu() {
+        return trainManageDao.findPullDownMenu();
+    }
     @Override
     public List<TrainInfo> searchByConditions(String statusOption, String trainData, String lessonOption) {
 

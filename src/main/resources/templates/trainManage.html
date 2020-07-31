@@ -16,11 +16,15 @@
         }
         .btn{font-size: 15px;
         }
+        .active{
+            border: red;
+        }
     </style>
 </head>
+
 <body>
 <ul class="nav nav-tabs">
-    <li role="presentation" class="active"><span><span class="glyphicon glyphicon-th-large" aria-hidden="true"></span><a href="#" onclick="showDiv1()">培训管理</a></span></li>
+    <li role="presentation"><span><span class="glyphicon glyphicon-th-large" aria-hidden="true"></span><a href="#" onclick="showDiv1()">培训管理</a></span></li>
     <li role="presentation"><span><span class="glyphicon glyphicon-th-large" aria-hidden="true"></span><a href="#" onclick="showDiv2()">培训明细</a></span></li>
     <li role="presentation"><span><span class="glyphicon glyphicon-align-center" aria-hidden="true"></span><a href="#" onclick="showDiv3()">培训人员明细</a></span></li>
     <li role="presentation"><span><span class="glyphicon glyphicon-edit" aria-hidden="true"></span><a href="#" onclick="showDiv4()">课程内容更新</a></span></li>
@@ -59,7 +63,7 @@
 
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            <table class="table table-hover table-bordered">
+            <table class="table table-hover table-bordered trainInfo" th:fragment="trainInfo">
 
                 <thead>
                 <tr>
@@ -82,7 +86,7 @@
                     <td th:text="${train.status}"></td>
                     <td th:text="${train.joinNum}"></td>
                     <td th:text="${train.joinNumtrue}"></td>
-                    <td><button class="btn btn-primary">操作</button></td>
+                    <td><button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">操作</button></td>
                 </tr>
                 </tbody>
 
@@ -92,6 +96,34 @@
 </div>
 
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">操作</h4>
+        </div>
+        <div class="modal-body">
+
+                <button class="btn btn-default modalBtn active" id="lessonContent" value="1">课程内容</button>
+                <button class="btn btn-success modalBtn" value="2">培训发布</button>
+                <button class="btn btn-info modalBtn" value="3">培训确定</button>
+                <button class="btn btn-warning modalBtn" id="trainList" value="4">培训名单</button>
+                <button class="btn btn-primary modalBtn" value="5">培训完了</button>
+
+
+        </div>
+        <div class="modal-footer">
+            <!--<button type="button" class="btn btn-default" data-dismiss="modal" id="quxiao">取消</button>-->
+            <!--<button type="button" class="btn btn-primary" id="confirm">确定</button>-->
+        </div>
+    </div>
+</div>
+</div>
+
+
 <!--</div>-->
 
 <!--div2-->
@@ -132,15 +164,15 @@
         </tr>
         <tr th:each="data:${empAndDep}">
             <td><input type="checkbox"></td>
-            <td th:text="${data.getEmp().getEmpId()}"></td>
-            <td th:text="${data.getDep().getDepName()}"></td>
-            <td th:text="${data.getEmp().getRole()}"></td>
+            <td th:text="${data.emp.empId}"></td>
+            <td th:text="${data.dep.depName}"></td>
+            <td th:text="${data.emp.role}"></td>
         </tr>
 
     </table>
-    <button id="aaa">点我</button>
+
 </div>
-<!--div4-->
+
 <div id="div4" style="display: none">div4</div>
 <!--div5-->
 <div id="div5" style="display: none">div5</div>
@@ -149,15 +181,59 @@
 
 </body>
 <script>
-    $("#aaa").click(function () {
-        $.ajax({
-            url:"/empNum",
-            success:function () {
 
-            }
+    //刷新名单，但是无法跳转，有Bug
+    // $("#trainList").click(function () {
+    //     window.location.href="/empNum";
+    // });
+
+        $("#trainList").click(function () {
+            $("#quxiao").click(function () {
+                showDiv3();
+                $.ajax({
+
+                })
+            });
+            showDiv3();
         })
-    })
+    // $(".modalBtn").click(function() {
+    //     $(".modalBtn").removeClass("active");
+    //     $(this).addClass("active");
+    // });
 
+
+    // $("#confirm").click(function(){
+    //     $(".modalBtn").each(function(){
+    //          if ($(this).hasClass("active")){
+    //
+    //             switch ($(this).val()) {
+    //                 case 1:
+    //                     alert("aa")
+    //                     showDiv4();
+    //                     break;
+    //                 case 2:
+    //                     alert("bb")
+    //                     $("#quxiao").click();
+    //                     break;
+    //                 case 3:
+    //
+    //                     break;
+    //                 case 4:
+    //                     showDiv3();
+    //                     break;
+    //                 case 5:
+    //
+    //                     break;
+    //             }
+    //          }
+    //     });
+    // });
+
+
+    //点击课程内容按钮跳转页面
+    // $("#lessonContent").click(function () {
+    //     showDiv4()
+    // });
     //授课类型的动态下拉框
     $.ajax({
         "url": "/xx",
@@ -165,9 +241,26 @@
             var opts = "";
             for (var i=0;i<data.length;i++){
 
-                var values = data[i].trainId;
+                var values = data[i].trainType;
                 var text = data[i].trainTypeName;
                 $("#addid").append("<option value='"+values+"'>"+text+"</option>")
+            }
+            // $("#addid").append(opts);
+            // $("#addid").selectpicker("refresh");
+
+        }
+    });
+    //第二个页面的动态下拉框
+    $.ajax({
+        "url": "/xx2",
+        "success": function (data) {
+            var opts = "";
+            for (var i=0;i<data.length;i++){
+
+                var values = data[i].trainType;
+                var text = data[i].trainTypeName;
+                $("#addid2").append("<option value='"+values+"'>"+text+"</option>")
+
             }
             // $("#addid").append(opts);
             // $("#addid").selectpicker("refresh");
@@ -181,44 +274,29 @@
         var statusOption = $(".combobox option:selected").val();
         var trainData = $("#trainDate").val();
         var lessonOption = $(".selectpicker option:selected").text();
+        // var lessonOptionVal = $(".selectpicker option:selected").val();
 
-        $.ajax({
-            url: "/searchByConditions",
-            data:{
-                statusOption : statusOption,
-                  trainData : trainData,
-                lessonOption : lessonOption
-            },
-            success: function (data) {
-
-            }
-        })
-    })
-
-    // 增加培训
-    $("#add").click(function () {
-        showDiv2();
+        window.location.href="/searchByConditions?"+"statusOption="+statusOption+"&"+"trainData="+trainData+"&"+"lessonOption="+lessonOption
         // $.ajax({
-        //     url:"/addNewLesson",
-        //     success:function (data) {
+        //     url: "/searchByConditions",
+        //     data:{
+        //         statusOption : statusOption,
+        //           trainData : trainData,
+        //         lessonOption : lessonOption
+        //     },
+        //     success: function (data) {
+        //         console.log(data)
+        //         // $(".trainInfo").html(data)
         //
         //     }
         // })
-        $.ajax({
-            "url": "/xx2",
-            "success": function (data) {
-                var opts = "";
-                for (var i=0;i<data.length;i++){
+    })
 
-                    var values = data[i].trainId;
-                    var text = data[i].trainTypeName;
-                    $("#addid2").append("<option value='"+values+"'>"+text+"</option>")
-                }
-                // $("#addid").append(opts);
-                // $("#addid").selectpicker("refresh");
+    // 增加培训课程
+    $("#add").click(function () {
+        showDiv2();
+        //先动态获取下拉框
 
-            }
-        });
     });
 
     //添加一个课程
@@ -333,6 +411,7 @@
         document.getElementById("div4").style.display="none";
         document.getElementById("div5").style.display="none";
         document.getElementById("div6").style.display="none";
+
 
     }
     function showDiv4() {

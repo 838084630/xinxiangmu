@@ -1,15 +1,21 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.dao.EmpRepository;
+import com.example.demo.domain.EmpAndDep;
+import com.example.demo.pojo.Train;
 import com.example.demo.pojo.TrainInfo;
 import com.example.demo.service.TrainManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.swing.plaf.PanelUI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,15 +27,20 @@ import java.util.Map;
 public class TrainManageController {
     @Autowired
     private TrainManageService trainManageService;
+    @Autowired
+    private EmpRepository empRepository;
+
 //    @RequestMapping("/trainManage")
 //    public String goTrainManage(){
 //        return "trainManage";
 //    }
 
-    @RequestMapping("/trainPage")
-    public String showPage(){
-        return "trainManage";
-    }
+//    @RequestMapping("/trainPage")
+//    public String showPage(){
+//        return "trainManage";
+//    }
+
+
     @RequestMapping("/trainOptions")
     @ResponseBody
     public List<TrainInfo> findOptions(Model model){
@@ -40,33 +51,55 @@ public class TrainManageController {
         return trainInfoList;
     }
 
-    @RequestMapping("/searchByConditions")
-    public String searchByConditions(String statusOption,String trainData,String lessonOption,Model model){
-        List<TrainInfo> trainInfoList = trainManageService.searchByConditions(statusOption, trainData, lessonOption);
-        for (int i = 0; i < trainInfoList.size(); i++) {
-            if(!trainInfoList.get(i).getTrainTypeName().equals(lessonOption)){
-                trainInfoList.remove(i);
-            }
-            System.out.println("BBBBBBBBBBBBB"+trainInfoList.get(i));
-        }
-       model.addAttribute("trainInfoList",trainInfoList);
-       return "trainManage";
+//    @RequestMapping("/searchByConditions")
+//    public String searchByConditions(String statusOption,String trainData,String lessonOption,Model model){
+//        List<TrainInfo> trainInfoList = trainManageService.searchByConditions(statusOption, trainData, lessonOption);
+//        for (int i = 0; i < trainInfoList.size(); i++) {
+//            if(!trainInfoList.get(i).getTrainTypeName().equals(lessonOption)){
+//                trainInfoList.remove(i);
+//            }
+//            System.out.println("BBBBBBBBBBBBB"+trainInfoList.get(i));
+//        }
+//        model.addAttribute("trainInfoList",trainInfoList);
+//       return "trainManage::trainInfo";
+//
+//    }
 
+
+//实验一下地址栏中取数据
+@RequestMapping("/searchByConditions")
+public String searchByConditions(@RequestParam("statusOption")String s,
+                                 @RequestParam("trainData")String t,
+                                 @RequestParam("lessonOption")String l,
+                                 Model model){
+
+    List<TrainInfo> trainInfoList = trainManageService.searchByConditions(s,t,l);
+    for (int i = 0; i < trainInfoList.size(); i++) {
+        if(!trainInfoList.get(i).getTrainTypeName().equals(l)){
+            trainInfoList.remove(i);
+        }
+//        System.out.println("BBBBBBBBBBBBB"+trainInfoList.get(i));
     }
+    model.addAttribute("trainInfoList",trainInfoList);
+    return "trainManage";
+
+
+}
+
 
 //    下拉框1
     @RequestMapping("/xx")
     @ResponseBody
-    public List<TrainInfo> options(){
-        List<TrainInfo> trainInfoList = trainManageService.findOptions();
+    public List<Train> options(){
+        List<Train> trainInfoList = trainManageService.findPullDownMenu();
 
         return trainInfoList;
     }
 //    下拉框2
     @RequestMapping("/xx2")
     @ResponseBody
-    public List<TrainInfo> options2(){
-        List<TrainInfo> trainInfoList = trainManageService.findOptions();
+    public List<Train> options2(){
+        List<Train> trainInfoList = trainManageService.findPullDownMenu();
 
         return trainInfoList;
     }
@@ -78,7 +111,13 @@ public Map addLesson(String subjects, String departmentName, String empname, Str
 
     String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
-////    查培训主表根据培训类名获取类名id，便于创建新的公告，先创建实体类
+//    先查询部门与姓名是否存在，若存在才能增加课程
+
+    List<EmpAndDep> empAndDeps = empRepository.queryDepIdBydepName(departmentName, empname);
+    System.out.println("查询所填部门及员工信息是否正确："+empAndDeps);
+
+
+//    查培训主表根据培训类名获取类名id，便于创建新的公告，先创建实体类
 //    trainManageService.queryTrainType(trainTypeName);
 //    get方法获取id
     TrainInfo trainInfo = new TrainInfo();
@@ -88,14 +127,14 @@ public Map addLesson(String subjects, String departmentName, String empname, Str
     trainInfo.setTrainTypeName(trainTypeName);
     trainInfo.setDirector(empname);
 
-//    trainInfo.setTrainType("");
-//    trainInfo.setDirector("");
-//    trainInfo.setGoal("");
-//    trainInfo.setDescription("");
-//    trainInfo.setStatus("");
-//    trainInfo.setCreateId(0);
-//    trainInfo.setUpdateId(0);
-//    trainInfo.setTrainId(2);
+    trainInfo.setTrainType("");
+    trainInfo.setDirector("");
+    trainInfo.setGoal("");
+    trainInfo.setDescription("");
+    trainInfo.setStatus("");
+    trainInfo.setCreateId(0);
+    trainInfo.setUpdateId(0);
+    trainInfo.setTrainId(2);
 
     TrainInfo result = trainManageService.saveTrainInfo(trainInfo);
     HashMap<String, Object> map = new HashMap<>();

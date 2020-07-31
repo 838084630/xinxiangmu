@@ -19,17 +19,16 @@ public class Emp {
     private String depId;
     @Column(name = "role")
     private String role;
-    @Column(name = "emp_status")
-    private int empStatus;
+
     public Emp(){
 
     }
-    public Emp(String empId, String empName, String depId, String role, Integer empStatus) {
+    public Emp(String empId, String empName, String depId, String role) {
         this.empId = empId;
         this.empName = empName;
         this.depId = depId;
         this.role = role;
-        this.empStatus = empStatus;
+
     }
 
     @Override
@@ -39,7 +38,6 @@ public class Emp {
                 ", empName='" + empName + '\'' +
                 ", depId='" + depId + '\'' +
                 ", role='" + role + '\'' +
-                ", empStatus='" + empStatus + '\'' +
                 '}';
     }
 }
