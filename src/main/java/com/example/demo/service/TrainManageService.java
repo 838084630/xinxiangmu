@@ -16,4 +16,6 @@ public interface TrainManageService {
     List<TrainInfo> searchByConditions(String statusOption,String trainData,String lessonOption);
 
     TrainInfo saveTrainInfo(TrainInfo trainInfo);
+
+    List<Train> findTrainTypeByName(String trainTypeName);
 }

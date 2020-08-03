@@ -38,10 +38,10 @@
     <div>
         <label style="display:inline;">培训状态：</label>
         <select class="combobox" style="width: 100px">
-            <option value="0">未发布</option>
-            <option value="1">报名中</option>
-            <option value="2">确定</option>
-            <option value="3">完了</option>
+            <option value="未发布">未发布</option>
+            <option value="报名中">报名中</option>
+            <option value="确定">确定</option>
+            <option value="完了">完了</option>
         </select>
     </div>
     <div>
@@ -82,7 +82,7 @@
                     <td th:text="${train.trainType}"></td>
                     <td th:text="${train.trainTypeName}"></td>
                     <td th:text="${train.startDate}"></td>
-                    <td th:text="${train.period}"></td>
+                    <td th:text="${train.director}"></td>
                     <td th:text="${train.status}"></td>
                     <td th:text="${train.joinNum}"></td>
                     <td th:text="${train.joinNumtrue}"></td>
@@ -150,26 +150,25 @@
 <div id="div3" style="display: none">
     <h3>培训管理/培训人员明细</h3>
     <button class="btn btn-warning">返回</button>
-    <div>
-
-        <button class="btn btn-danger">删除</button>
+    <table id="myTable">
         <button class="btn btn-info">追加</button>
-    </div>
-    <table class="table table-hover table-bordered" id="empTable">
-        <tr>
-            <th><button class="selectAll">全选</button></th>
-            <th>姓名</th>
-            <th>部门</th>
-            <th>职务</th>
-        </tr>
-        <tr th:each="data:${empAndDep}">
-            <td><input type="checkbox"></td>
-            <td th:text="${data.emp.empId}"></td>
-            <td th:text="${data.dep.depName}"></td>
-            <td th:text="${data.emp.role}"></td>
-        </tr>
-
+        <button id="del_btn" class="btn btn-danger">删除所选</button>
     </table>
+    <!--<table class="table table-hover table-bordered" id="empTable">-->
+        <!--<tr>-->
+            <!--<th><button class="selectAll">全选</button></th>-->
+            <!--<th>姓名</th>-->
+            <!--<th>部门</th>-->
+            <!--<th>职务</th>-->
+        <!--</tr>-->
+        <!--<tr th:each="data:${empAndDep}">-->
+            <!--<td><input type="checkbox"></td>-->
+            <!--<td th:text="${data.emp.empId}"></td>-->
+            <!--<td th:text="${data.dep.depName}"></td>-->
+            <!--<td th:text="${data.emp.role}"></td>-->
+        <!--</tr>-->
+
+    <!--</table>-->
 
 </div>
 
@@ -188,19 +187,47 @@
     // });
 
         $("#trainList").click(function () {
-            $("#quxiao").click(function () {
-                showDiv3();
-                $.ajax({
 
-                })
-            });
             showDiv3();
-        })
-    // $(".modalBtn").click(function() {
-    //     $(".modalBtn").removeClass("active");
-    //     $(this).addClass("active");
-    // });
+            //点击名单，先获取公告id，再根据这个id来查名单
 
+            $("#myTable").bootstrapTable({
+                url:"/empList",
+                classes:"table table-hover table-bordered",
+                pagination:true,
+                pageNumber:2,
+                pageSize:3,
+                pageList:[5,10,20],
+                showColumns:true,
+                showColumnsToggleAll:true,
+                showRefresh:true,
+                showToggle:true,
+                showFullscreen:true,
+                clickToSelect:true,
+                columns:[
+                    {
+                        checkbox:true
+                    },
+                    {
+                        title:"姓名",
+                        field:"empName",
+                        visible:false,
+                        titleTooltip:"人员姓名",
+                        showSelectTitle: true
+
+                    },
+                    {
+                        title:"部门",
+                        field:"dep"
+                    },
+                    {
+                        title:"职务",
+                        field:"role",
+                    },
+
+                ]
+            })
+        });
 
     // $("#confirm").click(function(){
     //     $(".modalBtn").each(function(){
@@ -318,7 +345,7 @@
                trainTypeName:selectValue
             },
             success:function (data) {
-                if (data.code==200){
+                if (data.code=="200"){
                     alert("成功")
                 }else{
                     alert("失败")
