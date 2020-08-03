@@ -11,6 +11,7 @@ public interface TrainManageService {
 
 
     List<TrainInfo> findOptions();
+
     List<Train> findPullDownMenu();
 
     List<TrainInfo> searchByConditions(String statusOption,String trainData,String lessonOption);
@@ -18,4 +19,5 @@ public interface TrainManageService {
     TrainInfo saveTrainInfo(TrainInfo trainInfo);
 
     List<Train> findTrainTypeByName(String trainTypeName);
+
 }

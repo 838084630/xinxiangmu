@@ -59,7 +59,7 @@
     </div>
 
     <button id="search" class="btn btn-primary glyphicon glyphicon-search">检索</button>
-    <button id="add" class="btn btn-success glyphicon glyphicon-edit">追加</button>
+    <button id="add1" class="btn btn-success glyphicon glyphicon-edit">追加</button>
 
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
@@ -79,6 +79,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="train : ${trainInfoList}">
+                    <input type="hidden" id="maxSumOfDateInYear" th:value="${train.trainId}"/>
                     <td th:text="${train.trainType}"></td>
                     <td th:text="${train.trainTypeName}"></td>
                     <td th:text="${train.startDate}"></td>
@@ -131,7 +132,7 @@
     <h3>培训管理/培训明细</h3>
     <button id="denglu" class="btn btn-success">登録</button>
     <button id="shanchu" class="btn btn-danger">删除</button>
-    <button id="fanhui" class="btn btn-warning">返回</button>
+    <button id="return1" class="btn btn-warning">返回</button>
     <div>
         <label style="display:inline;">课程名称：</label>
         <input type="text" class="form-control" id="lessonName" style="display:inline;width:200px;" autocomplete="off"/></br>
@@ -149,9 +150,9 @@
 <!--div3-->
 <div id="div3" style="display: none">
     <h3>培训管理/培训人员明细</h3>
-    <button class="btn btn-warning">返回</button>
+    <button class="btn btn-warning" id="return2">返回</button>
     <table id="myTable">
-        <button class="btn btn-info">追加</button>
+        <button class="btn btn-info" id="add2">追加</button>
         <button id="del_btn" class="btn btn-danger">删除所选</button>
     </table>
     <!--<table class="table table-hover table-bordered" id="empTable">-->
@@ -174,12 +175,23 @@
 
 <div id="div4" style="display: none">div4</div>
 <!--div5-->
-<div id="div5" style="display: none">div5</div>
+<div id="div5" style="display: none">
+  <h3>培训管理/培训人员检索</h3>
+    <label  style="display:inline;">部门：</label>
+    <select data-live-search="true" id="depType" style="width: 100px"></select>
+
+    <label  style="display:inline;">未参加授课类型：</label>
+    <select class="selectpicker3" data-live-search="true" name="addid" id="addid3" style="width: 100px"></select>
+    <button class="btn btn-warning" id="return3">返回</button>
+    <button class="btn btn-info" id="searchEmp">检索</button>
+</div>
+</div>
 <!--div6-->
 <div id="div6" style="display: none">div6</div>
 
 </body>
-<script>
+<script type="text/javascript" th:inline="none">
+
 
     //刷新名单，但是无法跳转，有Bug
     // $("#trainList").click(function () {
@@ -187,12 +199,14 @@
     // });
 
         $("#trainList").click(function () {
+            //点击名单，先获取公告id，再根据这个id来查名单
+            var max = $("#maxSumOfDateInYear").val();
 
             showDiv3();
             //点击名单，先获取公告id，再根据这个id来查名单
 
             $("#myTable").bootstrapTable({
-                url:"/empList",
+                url:"/empList?"+max,
                 classes:"table table-hover table-bordered",
                 pagination:true,
                 pageNumber:2,
@@ -272,8 +286,6 @@
                 var text = data[i].trainTypeName;
                 $("#addid").append("<option value='"+values+"'>"+text+"</option>")
             }
-            // $("#addid").append(opts);
-            // $("#addid").selectpicker("refresh");
 
         }
     });
@@ -289,8 +301,36 @@
                 $("#addid2").append("<option value='"+values+"'>"+text+"</option>")
 
             }
-            // $("#addid").append(opts);
-            // $("#addid").selectpicker("refresh");
+
+        }
+    });
+    //第四个页面的动态下拉框
+    $.ajax({
+        "url": "/xx3",
+        "success": function (data) {
+            var opts = "";
+            for (var i=0;i<data.length;i++){
+
+                var values = data[i].trainType;
+                var text = data[i].trainTypeName;
+                $("#addid3").append("<option value='"+values+"'>"+text+"</option>")
+
+            }
+
+        }
+    });
+    //第四个页面的部门动态下拉框
+    $.ajax({
+        "url": "/depType",
+        "success": function (data) {
+            var opts = "";
+            for (var i=0;i<data.length;i++){
+
+                var values = data[i].depId;
+                var text = data[i].depName;
+                $("#depType").append("<option value='"+values+"'>"+text+"</option>")
+
+            }
 
         }
     });
@@ -320,11 +360,18 @@
     })
 
     // 增加培训课程
-    $("#add").click(function () {
+    $("#add1").click(function () {
         showDiv2();
         //先动态获取下拉框
 
     });
+    //增加培训人员
+    $("#add2").click(function () {
+        showDiv5();
+        //先动态获取下拉框
+
+    });
+
 
     //添加一个课程
     $("#denglu").click(function () {
@@ -363,7 +410,15 @@
     });
 
     //从新增课程页面返回
-    $("#fanhui").click(function () {
+    $("#return1").click(function () {
+        showDiv1();
+    });
+    //从培训人员明细返回
+    $("#return2").click(function () {
+        showDiv1();
+    });
+    //从培训人员追加返回
+    $("#return3").click(function () {
         showDiv1();
     });
 
@@ -372,7 +427,25 @@
         //3.1获取到所有的CheckBox
         var checks = $(":checkBox");
         checks.prop("checked", true);
-    })
+    });
+
+    //检索未参加某个授课类型的某个部门的人员
+    $("#searchEmp").click(function () {
+        var depOption = $("#depType option:selected").text();
+        var lessonOption = $(".selectpicker3 option:selected").text();
+
+        $.ajax({
+            url:"/searchEmpByDep",
+            data: {
+                depOption:depOption,
+                lessonOption:lessonOption
+            },
+            success:function (data) {
+                console.log(data);
+            }
+        })
+    });
+
 
     function showDiv1() {
         document.getElementById("div1").style.display="block";

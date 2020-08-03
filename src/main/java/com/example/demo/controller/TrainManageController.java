@@ -1,8 +1,11 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.dao.DepRepository;
 import com.example.demo.dao.EmpRepository;
 import com.example.demo.domain.EmpAndDep;
+import com.example.demo.pojo.Dep;
+import com.example.demo.pojo.Emp;
 import com.example.demo.pojo.Train;
 import com.example.demo.pojo.TrainInfo;
 import com.example.demo.service.TrainManageService;
@@ -25,6 +28,8 @@ public class TrainManageController {
     private TrainManageService trainManageService;
     @Autowired
     private EmpRepository empRepository;
+    @Autowired
+    private DepRepository depRepository;
 
 
 
@@ -80,7 +85,7 @@ public String searchByConditions(@RequestParam("statusOption")String s,
 }
 
 
-//    下拉框1
+//    授课类型下拉框1
     @RequestMapping("/xx")
     @ResponseBody
     public List<Train> options(){
@@ -88,7 +93,7 @@ public String searchByConditions(@RequestParam("statusOption")String s,
 
         return trainInfoList;
     }
-//    下拉框2
+//    授课类型下拉框2
     @RequestMapping("/xx2")
     @ResponseBody
     public List<Train> options2(){
@@ -96,8 +101,25 @@ public String searchByConditions(@RequestParam("statusOption")String s,
 
         return trainInfoList;
     }
+//    授课类型下拉框3
+    @RequestMapping("/xx3")
+    @ResponseBody
+    public List<Train> options3(){
+        List<Train> trainInfoList = trainManageService.findPullDownMenu();
 
-//    新增课程
+        return trainInfoList;
+    }
+//      部门的下拉框
+    @RequestMapping("/depType")
+    @ResponseBody
+    public List<Dep> depType(){
+        List<Dep> trainInfoList = depRepository.findAll();
+
+        return trainInfoList;
+    }
+
+
+    //    新增课程
 @RequestMapping("/addLesson")
 @ResponseBody
 public Object addLesson(String subjects, String departmentName, String empname, String period, String trainTypeName){
