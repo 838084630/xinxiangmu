@@ -15,4 +15,7 @@ public interface StudentRepository extends JpaRepository<Student,String> {
 
     @Query(value = "select * from student where train_id = ?1", nativeQuery = true)
     List<Student> findEmpIdByTrainId(Integer integer);
+
+    @Query(value = "select * from student where train_id =?1 and emp_id = ?2", nativeQuery = true)
+    Student findOneResult(String trainId,String empId);
 }

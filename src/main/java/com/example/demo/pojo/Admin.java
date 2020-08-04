@@ -17,6 +17,10 @@ public class Admin {
     private String adminName;
     @Column(name = "admin_pass")
     private String adminPass;
+    @Column(name = "emp_id")
+    private String empId;
+    @Column(name = "level")
+    private String level;
 
 
 }

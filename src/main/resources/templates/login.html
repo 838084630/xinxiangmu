@@ -51,9 +51,18 @@
             success:function(data){
                 if(data["code"]=="200"){
                     var username = data["name"];
+                    var level = data["level"];
                     $("#result").html("");
-                alert("欢迎"+username)
-                    window.location.href='trainPage';
+                alert("欢迎"+username);
+                    if (level==0){
+
+                        window.location.href='trainPage?username='+username;
+
+                    }else {
+
+                        window.location.href='signUp?username='+username;
+
+                    }
                 }
                 if (data["code"]=="400"){
                     $("#result").html("用户名或密码错误").css("color","red");

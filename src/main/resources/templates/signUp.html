@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户报名</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <script src="../static/js/jquery-3.4.1.js"></script>
+    <script src="../static/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="../static/css/bootstrap-table.min.css">
+    <script src="../static/js/bootstrap-table.min.js"></script>
+    <script src="../static/js/bootstrap-table-zh-CN.min.js"></script>
+    <style>
+        a{
+            padding: 5px;
+            font-size: 20px;
+        }
+        .btn{font-size: 15px;
+        }
+        .active{
+            border: red;
+        }
+        .user{
+            position: absolute;
+            left: 300px;
+        }
+
+    </style>
+</head>
+<body>
+<ul class="nav nav-tabs">
+
+    <li role="presentation"><span><span class="glyphicon glyphicon-search" aria-hidden="true"></span><a href="#" onclick="showDiv6()">报名检索</a></span></li>
+    <li class="user">用户名：<span class="myName" style="color: red"></span></li>
+</ul>
+</body>
+<script>
+    (function ($) {
+        $.getUrlParam = function (name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+    })(jQuery);
+    var xx = $.getUrlParam('username');
+    $(".myName").html(xx);
+</script>
+</html>

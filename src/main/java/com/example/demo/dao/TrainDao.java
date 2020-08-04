@@ -12,4 +12,7 @@ public interface TrainDao extends JpaRepository<Train,String> {
     @Query(value = "select * from train where train_type_name = ?1",nativeQuery = true)
     List<Train> findByTrainTypeName(String trainTypeName);
 
+    @Query(value = "select * from train where train_type = ?1",nativeQuery = true)
+    Train findOne(String trainTypeName);
+
 }

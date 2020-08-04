@@ -9,6 +9,7 @@
     <script src="../static/js/bootstrap.js"></script>
     <link rel="stylesheet" href="../static/css/bootstrap-table.min.css">
     <script src="../static/js/bootstrap-table.min.js"></script>
+    <script src="../static/js/bootstrap-table-zh-CN.min.js"></script>
     <style>
         a{
             padding: 5px;
@@ -19,7 +20,15 @@
         .active{
             border: red;
         }
+        .user{
+            position: absolute;
+            left: 300px;
+        }
+        .myName{
+
+        }
     </style>
+
 </head>
 
 <body>
@@ -30,6 +39,7 @@
     <li role="presentation"><span><span class="glyphicon glyphicon-edit" aria-hidden="true"></span><a href="#" onclick="showDiv4()">课程内容更新</a></span></li>
     <li role="presentation"><span><span class="glyphicon glyphicon-user" aria-hidden="true"></span><a href="#" onclick="showDiv5()">培训人员追加</a></span></li>
     <li role="presentation"><span><span class="glyphicon glyphicon-search" aria-hidden="true"></span><a href="#" onclick="showDiv6()">报名检索</a></span></li>
+    <li class="user">用户名：<span class="myName" style="color: red"></span></li>
 </ul>
 <!--div1-->
 <div>
@@ -173,7 +183,25 @@
 
 </div>
 
-<div id="div4" style="display: none">div4</div>
+<div id="div4" style="display: none">
+    <h3>培训管理/课程内容更新</h3>
+    <button id="lessonUpdate" class="btn btn-success">登録</button>
+    <button id="clearAll" class="btn btn-danger">删除</button>
+    <button id="return4" class="btn btn-warning">返回</button>
+    <div>
+        <label style="display:inline;">课程目的：</label>
+        <input type="text" class="form-control" id="lessonGoal" style="display:inline;width:400px;" autocomplete="off"/>
+    </div>
+    <div>
+        <label style="display:inline;">课程大纲：</label>
+        <textarea class="form-control" style="display:inline;width:400px;" autocomplete="off" id="lessonOutline"></textarea>
+    </div>
+    <div>
+        <label style="display:inline;">课程内容：</label>
+        <textarea class="form-control" style="display:inline;width:400px;" autocomplete="off" id="lessonSubstance"></textarea>
+    </div>
+</div>
+
 <!--div5-->
 <div id="div5" style="display: none">
   <h3>培训管理/培训人员检索</h3>
@@ -182,17 +210,28 @@
 
     <label  style="display:inline;">未参加授课类型：</label>
     <select class="selectpicker3" data-live-search="true" name="addid" id="addid3" style="width: 100px"></select>
-    <button class="btn btn-warning" id="return3">返回</button>
     <button class="btn btn-info" id="searchEmp">检索</button>
+    <button class="btn btn-warning" id="return3">返回</button>
+    <table id="empTable">
+    </table>
 </div>
-</div>
+
 <!--div6-->
 <div id="div6" style="display: none">div6</div>
 
 </body>
 <script type="text/javascript" th:inline="none">
+    (function ($) {
+        $.getUrlParam = function (name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+    })(jQuery);
+    var xx = $.getUrlParam('username');
+    $(".myName").html(xx);
 
-
+     var trainId = "";
     //刷新名单，但是无法跳转，有Bug
     // $("#trainList").click(function () {
     //     window.location.href="/empNum";
@@ -201,7 +240,7 @@
         $("#trainList").click(function () {
             //点击名单，先获取公告id，再根据这个id来查名单
             var max = $("#maxSumOfDateInYear").val();
-
+            trainId = max;
             showDiv3();
             //点击名单，先获取公告id，再根据这个id来查名单
 
@@ -225,7 +264,6 @@
                     {
                         title:"姓名",
                         field:"empName",
-                        visible:false,
                         titleTooltip:"人员姓名",
                         showSelectTitle: true
 
@@ -238,37 +276,42 @@
                         title:"职务",
                         field:"role",
                     },
-
+                    {
+                        title:"操作",
+                        field:"price",
+                        formatter:function (value,row) {
+                            return `<button onclick='del(${row.empName})' class='btn btn-danger'>删除</button>`;
+                            // return "$"+row.price;
+                        }
+                    }
                 ]
             })
         });
 
-    // $("#confirm").click(function(){
-    //     $(".modalBtn").each(function(){
-    //          if ($(this).hasClass("active")){
-    //
-    //             switch ($(this).val()) {
-    //                 case 1:
-    //                     alert("aa")
-    //                     showDiv4();
-    //                     break;
-    //                 case 2:
-    //                     alert("bb")
-    //                     $("#quxiao").click();
-    //                     break;
-    //                 case 3:
-    //
-    //                     break;
-    //                 case 4:
-    //                     showDiv3();
-    //                     break;
-    //                 case 5:
-    //
-    //                     break;
-    //             }
-    //          }
-    //     });
-    // });
+    //    点击删除所选，进行批量删除
+    $("#del_btn").click(function () {
+        var selectedRows = $("#myTable").bootstrapTable("getSelections");
+        // var queryParams = "?";
+        var queryParams = "";
+        selectedRows.forEach(function (row) {
+            // queryParams+=("id="+row.id);
+            // queryParams+="&";
+            queryParams+=(row.empName);
+            queryParams+=",";
+        })
+        queryParams = queryParams.substring(0,queryParams.length-1);
+        alert(queryParams+trainId)
+        $.ajax({
+            url:"/batchDelete?"+queryParams,
+            data:{
+                trainId:trainId
+            },
+            success:function () {
+                $("#myTable").bootstrapTable("refresh")
+            }
+        })
+    })
+
 
 
     //点击课程内容按钮跳转页面
@@ -371,6 +414,10 @@
         //先动态获取下拉框
 
     });
+    //更新课程内容，点击课程内容跳进div4
+    $("#lessonContent").click(function () {
+        showDiv4();
+    })
 
 
     //添加一个课程
@@ -401,12 +448,47 @@
         })
     });
 
+    //更新一个课程
+    $("#lessonUpdate").click(function () {
+        var lessonGoal = $("#lessonGoal").val();
+        var lessonOutline = $("#lessonOutline").val();
+        var lessonSubstance = $("#lessonSubstance").val();
+        var max = $("#maxSumOfDateInYear").val();
+        var trainTypeId = $("#addid").val();
+        alert(trainTypeId)
+        $.ajax({
+            url:"/updateLesson",
+            data:{
+                goal:lessonGoal,
+                discription:lessonOutline,
+                substance:lessonSubstance,
+                trainId:max,
+                trainType:trainTypeId
+            },
+            success:function (data) {
+                if (data.code=="200"){
+                    alert("更新成功")
+                }else {
+                    alert("更新失败")
+                }
+            }
+        })
+    });
+
+
     //清空添加课程时的输入框
     $("#shanchu").click(function () {
         $("#lessonName").val("");
         $("#directorDep").val("");
         $("#directorName").val("");
         $("#lessonDate").val("");
+    });
+
+    //清空课程更新时的输入框
+    $("#clearAll").click(function () {
+        $("#lessonGoal").val("");
+        $("#lessonOutline").val("");
+        $("#lessonSubstance").val("");
     });
 
     //从新增课程页面返回
@@ -421,6 +503,10 @@
     $("#return3").click(function () {
         showDiv1();
     });
+    //从课程内容更新返回
+    $("#return4").click(function () {
+        showDiv1();
+    });
 
 
     $(".selectAll").click(function() {
@@ -430,6 +516,7 @@
     });
 
     //检索未参加某个授课类型的某个部门的人员
+    // TODO:这个最后再写
     $("#searchEmp").click(function () {
         var depOption = $("#depType option:selected").text();
         var lessonOption = $(".selectpicker3 option:selected").text();
@@ -442,6 +529,29 @@
             },
             success:function (data) {
                 console.log(data);
+                $("#empTable").bootstrapTable({
+                    url:"/showUncommitedEmp",
+                    classes:"table table-hover table-bordered",
+                    columns:[
+                        {
+                            title:"姓名",
+                            field:"empName",
+                            titleTooltip:"人员姓名",
+                            showSelectTitle: true
+
+                        },
+                        {
+                            title:"部门ID",
+                            field:"depId"
+                        },
+                        {
+                            title:"职务",
+                            field:"role",
+                        },
+
+                    ]
+                })
+
             }
         })
     });
