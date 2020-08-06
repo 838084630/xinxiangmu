@@ -105,14 +105,9 @@ public class EmpController {
             String result = emps.get(i);
             Emp byEmpName = empRepository.findByEmpName(result);
             String empId = byEmpName.getEmpId();
-
-            System.out.println("trainId:"+trainId);
-            System.out.println("empId:"+empId);
             Student one = studentRepository.findOneResult(trainId,empId);
+            studentRepository.delete(one);
 
-            System.out.println(one.getEmpId());
-            one.setFlg(0);
-            studentRepository.save(one);
 
         }
 

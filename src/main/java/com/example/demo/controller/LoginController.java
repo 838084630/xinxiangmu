@@ -24,8 +24,6 @@ public class LoginController {
                                           @RequestParam(value = "adminPass")String adminPass ,
                                           HttpSession session
                                           ){
-        System.out.println("前端传来的名字："+adminName);
-        System.out.println("前端传来的密码："+adminPass);
         Admin result = loginService.findByAdminNameAndAdminPass(adminName, adminPass);
         session.setAttribute("username",adminName);
         session.setAttribute("password",adminPass);

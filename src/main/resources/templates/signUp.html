@@ -30,10 +30,25 @@
 <ul class="nav nav-tabs">
 
     <li role="presentation"><span><span class="glyphicon glyphicon-search" aria-hidden="true"></span><a href="#" onclick="showDiv6()">报名检索</a></span></li>
-    <li class="user">用户名：<span class="myName" style="color: red"></span></li>
+    <li class="user">用户名：<span class="myName" style="color: red"></span><button id="ChangeUser" class="glyphicon glyphicon-log-out">切换用户</button></li>
+
 </ul>
+<div>
+    <label style="display:inline;">培训No：&nbsp;&nbsp;</label>
+    <input type="text" class="form-control" id="trainId" style="display:inline;width:100px;height: 20px" autocomplete="off"/></br>
+    <label  style="display:inline;">授课类型：</label>
+    <select class="selectpicker3" data-live-search="true" name="addid" id="addid4" style="width: 100px"></select>
+</div>
+<div>
+    <button class="btn-info" id="search">检索</button>
+</div>
+<table id="trainTable">
+
+</table>
+<h3 id="message"></h3>
 </body>
 <script>
+    var myName = "";
     (function ($) {
         $.getUrlParam = function (name) {
             var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
@@ -42,6 +57,103 @@
         }
     })(jQuery);
     var xx = $.getUrlParam('username');
-    $(".myName").html(xx);
+    myName=xx;
+    $(".myName").html(myName);
+
+    $.ajax({
+        "url": "/xx4",
+        "success": function (data) {
+            var opts = "";
+            for (var i=0;i<data.length;i++){
+
+                var values = data[i].trainType;
+                var text = data[i].trainTypeName;
+                $("#addid4").append("<option value='"+values+"'>"+text+"</option>")
+
+            }
+
+        }
+    });
+
+    $("#search").click(function () {
+        var trainType = $(".selectpicker3 option:selected").text();
+        var trainId = $("#trainId").val();
+        $("#message").html("");
+        $.ajax({
+            url:"/searchTrain",
+            data:{
+                trainType:trainType,
+                trainId:trainId
+            },
+            success:function (data) {
+                console.log(data);
+
+                if (data==null ||data==""){
+                    $("#message").html("未找到任何数据")
+                }else {
+                    $("#trainTable").bootstrapTable({
+                        url:"/queryTrainInfo",
+                        classes:"table table-hover table-bordered",
+                        columns:[
+                            {
+                                title:"培训ID",
+                                field:"trainId",
+                                titleTooltip:"培训ID",
+                                showSelectTitle: true
+
+                            },
+                            {
+                                title:"培训名称",
+                                field:"trainTypeName",
+                                titleTooltip:"培训名称",
+                                showSelectTitle: true
+
+                            },
+                            {
+                                title:"实施日",
+                                field:"startDate"
+                            },
+                            {
+                                title:"授课者",
+                                field:"director",
+                            },
+                            {
+                                title:"操作",
+                                field:"price",
+                                formatter:function (value,row) {
+                                    return `<button onclick='sub(${row.trainId})' class='btn btn-success'>参加</button>`;
+                                    // return "$"+row.price;
+                                }
+                            }
+
+                        ]
+                    })
+                }
+
+            }
+
+        })
+    })
+
+    function sub(id){
+        var trainType = $(".selectpicker3 option:selected").text();
+        var trainId = $("#trainId").val();
+        $.ajax({
+            url:"/changeFlg",
+            data:{
+                trainType:trainType,
+                trainId:trainId,
+                empName:myName
+                 },
+            success:function (data) {
+
+                alert(data.message)
+            }
+        })
+    }
+
+    $("#ChangeUser").click(function () {
+        window.location.href="/adminLogin"
+    })
 </script>
 </html>

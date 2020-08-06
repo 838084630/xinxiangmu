@@ -1,10 +1,7 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.dao.DepRepository;
-import com.example.demo.dao.EmpRepository;
-import com.example.demo.dao.TrainDao;
-import com.example.demo.dao.TrainManageDao;
+import com.example.demo.dao.*;
 import com.example.demo.domain.EmpAndDep;
 import com.example.demo.pojo.Dep;
 import com.example.demo.pojo.Emp;
@@ -38,6 +35,8 @@ public class TrainManageController {
     private DepRepository depRepository;
     @Autowired
     private TrainDao trainDao;
+    @Autowired
+    private StudentRepository studentRepository;
 
 
     @RequestMapping("/trainPage")
@@ -56,34 +55,22 @@ public class TrainManageController {
         return trainInfoList;
     }
 
-//    @RequestMapping("/searchByConditions")
-//    public String searchByConditions(String statusOption,String trainData,String lessonOption,Model model){
-//        List<TrainInfo> trainInfoList = trainManageService.searchByConditions(statusOption, trainData, lessonOption);
-//        for (int i = 0; i < trainInfoList.size(); i++) {
-//            if(!trainInfoList.get(i).getTrainTypeName().equals(lessonOption)){
-//                trainInfoList.remove(i);
-//            }
-//            System.out.println("BBBBBBBBBBBBB"+trainInfoList.get(i));
-//        }
-//        model.addAttribute("trainInfoList",trainInfoList);
-//       return "trainManage::trainInfo";
-//
-//    }
 
 
-    //实验一下地址栏中取数据
+    //培训检索
     @RequestMapping("/searchByConditions")
     public String searchByConditions(@RequestParam("statusOption") String s,
                                      @RequestParam("trainData") String t,
                                      @RequestParam("lessonOption") String l,
                                      Model model) {
 
+//        先查询出报名此培训的所有人，更新trainInfo中的人数
+
         List<TrainInfo> trainInfoList = trainManageService.searchByConditions(s, t, l);
         for (int i = 0; i < trainInfoList.size(); i++) {
-//        if(!trainInfoList.get(i).getTrainTypeName().equals(l)){
-//            trainInfoList.remove(i);
-//        }
-            System.out.println("BBBBBBBBBBBBB" + trainInfoList.get(i));
+            int trainId = trainInfoList.get(i).getTrainId();
+            int number = studentRepository.findByTrainId(trainId);
+            trainInfoList.get(i).setJoinNumtrue(number);
         }
         model.addAttribute("trainInfoList", trainInfoList);
         return "trainManage";
@@ -114,6 +101,14 @@ public class TrainManageController {
     @RequestMapping("/xx3")
     @ResponseBody
     public List<Train> options3() {
+        List<Train> trainInfoList = trainManageService.findPullDownMenu();
+
+        return trainInfoList;
+    }
+    //    授课类型下拉框4
+    @RequestMapping("/xx4")
+    @ResponseBody
+    public List<Train> options4() {
         List<Train> trainInfoList = trainManageService.findPullDownMenu();
 
         return trainInfoList;
@@ -155,7 +150,6 @@ public class TrainManageController {
 
 //        通过授课类型查询授课类型的ID
             List<Train> trainTypeByName = trainManageService.findTrainTypeByName(trainTypeName);
-            System.out.println("*********" + trainTypeByName);
             String trainType = "";
             for (int i = 0; i < trainTypeByName.size(); i++) {
                 trainType = "";
@@ -212,5 +206,24 @@ public class TrainManageController {
             map.put("code","400");
         }
        return map;
+    }
+
+    @RequestMapping("/changeStatus")
+    @ResponseBody
+    public String changeStatus(String trainId,String status){
+        int i = Integer.parseInt(trainId);
+        System.out.println("XXXXX"+trainId);
+        System.out.println("XXXXX"+status);
+        TrainInfo byTrainId = trainManageDao.findByTrainId(i);
+        if (status.equals("培训发布")){
+            status = "已发布";
+        }else if (status.equals("培训确定")){
+            status = "已确定";
+        }else if (status.equals("培训完了")){
+            status = "已完结";
+        }
+        byTrainId.setStatus(status);
+        trainManageDao.save(byTrainId);
+        return "OK";
     }
 }

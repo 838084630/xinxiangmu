@@ -43,16 +43,13 @@ public class SerchEmpController {
         Dep depId = depRepository.findDepIdByDepName(depOption);
         String depId1 = depId.getDepId();
         List<Emp> empId = empRepository.findEmpIdByDepId(depId);
-//        System.out.println("XXXXXX"+empId);
         for (int i = 0; i < empId.size(); i++) {
 
             emp1.add(empId.get(i).getEmpId());
         }
         List<TrainInfo> trainIdList = trainManageDao.findTrainIdByType(lessonOption);
-//        System.out.println("YYYYYY"+trainIdList);
         for (int i = 0; i < trainIdList.size(); i++) {
             int trainId = trainIdList.get(i).getTrainId();
-//            String s = String.valueOf(trainId);
             List<Student> result2 = studentRepository.findEmpIdByTrainId(trainId);
 
 //            这是参加了该授课类型的人员ID；
@@ -60,8 +57,6 @@ public class SerchEmpController {
                 emp2.add(result2.get(j).getEmpId());
             }
         }
-//        System.out.println("QQQQQQQQQQQQQQQQQQQ"+emp1);
-//        System.out.println("QQQQQQQQQQQQQQQQQQQ"+emp2);
         for (int i = 0; i < emp1.size(); i++) {
             for (int j = 0; j < emp2.size(); j++) {
                 if (emp1.get(i).equals(emp2.get(j))) {
@@ -74,7 +69,6 @@ public class SerchEmpController {
 //这是查到的去掉参加的人的所有人员表，需要再根据部门去掉多余的人员
         List<Emp> AllEmp = empRepository.findByEmpIdNotIn(emp3);
 //根据传来的部门，查询出最后的结果
-        System.out.println("奇怪了" + depId1);
         ArrayList<Emp> list1 = new ArrayList<>();
         for (int i = 0; i < AllEmp.size(); i++) {
             if (AllEmp.get(i).getDepId().equals(depId1)) {

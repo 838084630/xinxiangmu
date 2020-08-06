@@ -7,22 +7,49 @@
     <script src="../static/js/jquery-3.4.1.js"></script>
     <script src="../static/js/bootstrap.js"></script>
 </head>
+<style>
+    #box {
+        background-color: rgba(255, 255, 255, 0.8);
+        width: 600px;
+        height: 400px;
+        border-radius:20px;
+        left: 600px;
+        top: 200px;
+        position: absolute;
+    }
+    h2{
+        color: white;
+    }
+
+</style>
 <body>
 
-<!-- 登录表单 -->
-<form style="margin-left:500px;margin-top:200px;" id="loginForm">
-    <div class="form-group">
-        <label for="user" stype="display:inline;" >账户：</label>
-        <input type="text" class="form-control" name="adminName" id="user" style="display:inline;width:200px;"autocomplete="off" />
-    </div>
-    <div class="form-group">
-        <label for="password" style="display:inline;">密码：</label>
-        <input type="text" class="form-control" name="adminName" id="password" style="display:inline;width:200px;"autocomplete="off" />
-    </div>
-    <button type="button" class="btn btn-primary" id="button_submit">登录</button>
-    <div id="result"></div>
+<div class="img"><img src="../static/3.jpg" height="880px" width="2000px"/>
+    <!-- 登录表单 -->
+    <div id="box">
+        <span><center style="margin-top: 50px"><h2>用户登录</h2></center></span>
+        <hr style="background-color:darkgray; border: none;height: 2px;"/>
+        <!--style="margin-left:500px;margin-top:200px;"-->
+        <form id="loginForm" style="margin-left:160px;margin-top:80px;">
+            <div class="form-group">
+                <label for="user" stype="display:inline;"><span class="glyphicon glyphicon glyphicon-user"
+                                                                aria-hidden="true"></span>账户：</label>
+                <input type="text" class="form-control" name="adminName" id="user" style="display:inline;width:200px;"
+                       autocomplete="off" placeholder="请输入账号"/>
+            </div>
+            <div class="form-group">
+                <label for="password" style="display:inline;"><span class="glyphicon glyphicon glyphicon-asterisk"
+                                                                    aria-hidden="true"></span>密码：</label>
+                <input type="text" class="form-control" name="adminName" id="password"
+                       style="display:inline;width:200px;"
+                       autocomplete="off" placeholder="请输入密码"/>
+            </div>
+            <button type="button" class="btn btn-primary " id="button_submit" style="margin-left: 200px">登录<span class="glyphicon glyphicon-log-in"></span></button>
+            <div id="result"></div>
 
-</form>
+        </form>
+    </div>
+</div>
 </body>
 <script>
     // function login() {
@@ -34,7 +61,7 @@
     //     })
     // }
 
-    $("#button_submit").click(function(){
+    $("#button_submit").click(function () {
         //序列化表单元素，返回json数据
         var params = $("#loginForm").serializeArray();
 
@@ -42,30 +69,30 @@
         //params.push({name:"hello",value:"man"});
 
         $.ajax({
-            type:"POST",
-            url:"/adminLogin",
-            data:{
-                adminName:$("#user").val(),
-                adminPass:$("#password").val()
+            type: "POST",
+            url: "/adminLogin",
+            data: {
+                adminName: $("#user").val(),
+                adminPass: $("#password").val()
             },
-            success:function(data){
-                if(data["code"]=="200"){
+            success: function (data) {
+                if (data["code"] == "200") {
                     var username = data["name"];
                     var level = data["level"];
                     $("#result").html("");
-                alert("欢迎"+username);
-                    if (level==0){
+                    alert("欢迎" + username);
+                    if (level == 0) {
 
-                        window.location.href='trainPage?username='+username;
+                        window.location.href = 'trainPage?username=' + username;
 
-                    }else {
+                    } else {
 
-                        window.location.href='signUp?username='+username;
+                        window.location.href = 'signUp?username=' + username;
 
                     }
                 }
-                if (data["code"]=="400"){
-                    $("#result").html("用户名或密码错误").css("color","red");
+                if (data["code"] == "400") {
+                    $("#result").html("用户名或密码错误").css("color", "red");
                 }
             }
 

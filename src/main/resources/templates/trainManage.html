@@ -49,9 +49,9 @@
         <label style="display:inline;">培训状态：</label>
         <select class="combobox" style="width: 100px">
             <option value="未发布">未发布</option>
-            <option value="报名中">报名中</option>
-            <option value="确定">确定</option>
-            <option value="完了">完了</option>
+            <option value="已发布">已发布</option>
+            <option value="已确定">已确定</option>
+            <option value="已完结">已完结</option>
         </select>
     </div>
     <div>
@@ -59,10 +59,6 @@
         <input type="text" class="form-control" id="trainDate" style="display:inline;width:200px;" autocomplete="off"/>
     </div>
     <br>
-    <!--<label style="display:inline;">授课类型：</label>-->
-    <!--<select name="ChanneltypeID" class="layui-select">-->
-        <!--<option th:each="trainInfo : ${trainInfoList}" th:value="${trainInfo.trainId}" th:text="${trainInfo.trainTypeName}">-->
-    <!--</select></br>-->
     <div>
     <label  style="display:inline;">授课类型：</label>
         <select class="selectpicker" data-live-search="true" name="addid" id="addid" style="width: 100px"></select>
@@ -97,7 +93,7 @@
                     <td th:text="${train.status}"></td>
                     <td th:text="${train.joinNum}"></td>
                     <td th:text="${train.joinNumtrue}"></td>
-                    <td><button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">操作</button></td>
+                    <td><button class="btn btn-primary btn-lg getStatus" data-toggle="modal" data-target="#myModal" th:value="${train.status}">操作</button></td>
                 </tr>
                 </tbody>
 
@@ -119,12 +115,11 @@
         <div class="modal-body">
 
                 <button class="btn btn-default modalBtn active" id="lessonContent" value="1">课程内容</button>
-                <button class="btn btn-success modalBtn" value="2">培训发布</button>
-                <button class="btn btn-info modalBtn" value="3">培训确定</button>
+                <button class="btn btn-success modalBtn" id="lessonPublish" value="2">培训发布</button>
+                <button class="btn btn-info modalBtn" id="lessonConfirm" value="3">培训确定</button>
                 <button class="btn btn-warning modalBtn" id="trainList" value="4">培训名单</button>
-                <button class="btn btn-primary modalBtn" value="5">培训完了</button>
-
-
+                <button class="btn btn-primary modalBtn" id="lessonComplet" value="5">培训完了</button>
+                <h4 id="message"></h4>
         </div>
         <div class="modal-footer">
             <!--<button type="button" class="btn btn-default" data-dismiss="modal" id="quxiao">取消</button>-->
@@ -133,9 +128,6 @@
     </div>
 </div>
 </div>
-
-
-<!--</div>-->
 
 <!--div2-->
 <div id="div2" style="display: none">
@@ -165,21 +157,6 @@
         <button class="btn btn-info" id="add2">追加</button>
         <button id="del_btn" class="btn btn-danger">删除所选</button>
     </table>
-    <!--<table class="table table-hover table-bordered" id="empTable">-->
-        <!--<tr>-->
-            <!--<th><button class="selectAll">全选</button></th>-->
-            <!--<th>姓名</th>-->
-            <!--<th>部门</th>-->
-            <!--<th>职务</th>-->
-        <!--</tr>-->
-        <!--<tr th:each="data:${empAndDep}">-->
-            <!--<td><input type="checkbox"></td>-->
-            <!--<td th:text="${data.emp.empId}"></td>-->
-            <!--<td th:text="${data.dep.depName}"></td>-->
-            <!--<td th:text="${data.emp.role}"></td>-->
-        <!--</tr>-->
-
-    <!--</table>-->
 
 </div>
 
@@ -221,6 +198,8 @@
 
 </body>
 <script type="text/javascript" th:inline="none">
+
+    var myName = "";
     (function ($) {
         $.getUrlParam = function (name) {
             var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
@@ -229,18 +208,20 @@
         }
     })(jQuery);
     var xx = $.getUrlParam('username');
-    $(".myName").html(xx);
+    myName = xx ;
+    $(".myName").html(myName);
 
      var trainId = "";
-    //刷新名单，但是无法跳转，有Bug
-    // $("#trainList").click(function () {
-    //     window.location.href="/empNum";
-    // });
 
         $("#trainList").click(function () {
             //点击名单，先获取公告id，再根据这个id来查名单
             var max = $("#maxSumOfDateInYear").val();
             trainId = max;
+
+            //*******************
+            $('#myModal').modal('toggle')
+            // $('#myModal').modal('hide')
+            //*******************
             showDiv3();
             //点击名单，先获取公告id，再根据这个id来查名单
 
@@ -311,8 +292,6 @@
             }
         })
     })
-
-
 
     //点击课程内容按钮跳转页面
     // $("#lessonContent").click(function () {
@@ -386,20 +365,10 @@
         var lessonOption = $(".selectpicker option:selected").text();
         // var lessonOptionVal = $(".selectpicker option:selected").val();
 
-        window.location.href="/searchByConditions?"+"statusOption="+statusOption+"&"+"trainData="+trainData+"&"+"lessonOption="+lessonOption
-        // $.ajax({
-        //     url: "/searchByConditions",
-        //     data:{
-        //         statusOption : statusOption,
-        //           trainData : trainData,
-        //         lessonOption : lessonOption
-        //     },
-        //     success: function (data) {
-        //         console.log(data)
-        //         // $(".trainInfo").html(data)
-        //
-        //     }
-        // })
+        window.location.href="/searchByConditions?"+"statusOption="+statusOption
+            +"&"+"trainData="+trainData
+            +"&"+"lessonOption="+lessonOption
+            +"&"+"username="+myName
     })
 
     // 增加培训课程
@@ -416,8 +385,94 @@
     });
     //更新课程内容，点击课程内容跳进div4
     $("#lessonContent").click(function () {
-        showDiv4();
-    })
+        let status = $("#lessonContent").text();
+        var val = $(".getStatus").val();
+        if (val=="未发布"){
+            showDiv4();
+            $('#myModal').modal('toggle')
+        }else if (val=="已确定"){
+            $("#message").html("该课程已确定，不能修改课程")
+        }else if (val=="已完结"){
+            $("#message").html("该课程已完结，不能修改课程")
+        }
+    });
+    //培训发布
+    $("#lessonPublish").click(function () {
+        let trainId = $("#maxSumOfDateInYear").val();
+        let status = $("#lessonPublish").text();
+        var val = $(".getStatus").val();
+        if (val=="未发布"){
+            $('#myModal').modal('toggle')
+            $.ajax({
+                url:"/changeStatus",
+                data:{
+                    trainId:trainId,
+                    status:status
+                },
+                success:function () {
+
+                }
+            })
+        }else if (val=="已发布"){
+            $("#message").html("该课程已发布，请勿重复操作")
+        }else if (val=="已确定"){
+            $("#message").html("该课程已确定，不能发布")
+        }else if (val=="已完结"){
+            $("#message").html("该课程已完结，不能发布")
+        }
+
+    });
+    //培训确定
+    $("#lessonConfirm").click(function () {
+        let trainId = $("#maxSumOfDateInYear").val();
+        let status = $("#lessonConfirm").text();
+        var val = $(".getStatus").val();
+        if (val=="已发布"){
+            $('#myModal').modal('toggle')
+            $.ajax({
+                url:"/changeStatus",
+                data:{
+                    trainId:trainId,
+                    status:status
+                },
+                success:function () {
+
+                }
+            })
+        }else if (val=="未发布"){
+            $("#message").html("课程未发布，请先发布")
+        }else if (val=="已确定"){
+            $("#message").html("该课程已确定，请勿重复操作")
+        }else if (val=="已完结"){
+            $("#message").html("该课程已完结，不能发布")
+        }
+    });
+    //培训完了
+    $("#lessonComplet").click(function () {
+        let trainId = $("#maxSumOfDateInYear").val();
+        let status = $("#lessonComplet").text();
+        var val = $(".getStatus").val();
+        if (val=="已确定"){
+            $('#myModal').modal('toggle')
+            $.ajax({
+                url:"/changeStatus",
+                data:{
+                    trainId:trainId,
+                    status:status
+                },
+                success:function () {
+
+                }
+            })
+        }else if (val=="未发布"){
+            $("#message").html("课程未发布，请先发布")
+        }else if (val=="已发布"){
+            $("#message").html("该课程已发布，请先确定")
+        }else if (val=="已完结"){
+            $("#message").html("该课程已完结，请勿重复操作")
+        }
+
+    });
 
 
     //添加一个课程
@@ -564,46 +619,7 @@
         document.getElementById("div4").style.display="none";
         document.getElementById("div5").style.display="none";
         document.getElementById("div6").style.display="none";
-
-
     }
-
-
-    //使用bootstrap动态加载表格
-    // $('.table').bootstrapTable({
-    //     url: '/trainOptions',
-    //     pagination: true,
-    //     columns: [{
-    //         field: 'trainType',
-    //         title: '培训No.'
-    //     }, {
-    //         field: 'trainTypeName',
-    //         title: '培训名称'
-    //     }, {
-    //         field: 'startDate',
-    //         title: '实施日'
-    //     }, {
-    //     field: 'director',
-    //         title: '授课者'
-    //     }, {
-    //         field: 'status',
-    //         title: '培训状态'
-    //     }, {
-    //         field: 'joinNum',
-    //         title: '计划人数'
-    //     }, {
-    //         field: 'joinNumtrue',
-    //         title: '确认人数'
-    //     }
-    //     ,{
-    //         formatter:function (value,row) {
-    //             return `<button onclick='del(${row.id})' class='btn btn-danger'>操作</button>`;
-    //             // return "$"+row.price;
-    //         }
-    //     }
-    //
-    //     ]
-    // })
 
     function showDiv2() {
         document.getElementById("div2").style.display="block";
@@ -612,7 +628,6 @@
         document.getElementById("div4").style.display="none";
         document.getElementById("div5").style.display="none";
         document.getElementById("div6").style.display="none";
-
     }
     function showDiv3() {
         document.getElementById("div3").style.display="block";
@@ -621,8 +636,6 @@
         document.getElementById("div4").style.display="none";
         document.getElementById("div5").style.display="none";
         document.getElementById("div6").style.display="none";
-
-
     }
     function showDiv4() {
         document.getElementById("div4").style.display="block";
@@ -631,16 +644,14 @@
         document.getElementById("div3").style.display="none";
         document.getElementById("div5").style.display="none";
         document.getElementById("div6").style.display="none";
-
     }
     function showDiv5() {
         document.getElementById("div5").style.display="block";
-        document.getElementById("div2").style.display="none";
+        document.getElementById("div1").style.display="none";
         document.getElementById("div2").style.display="none";
         document.getElementById("div3").style.display="none";
         document.getElementById("div4").style.display="none";
         document.getElementById("div6").style.display="none";
-
     }
     function showDiv6() {
         document.getElementById("div6").style.display="block";
@@ -649,10 +660,7 @@
         document.getElementById("div3").style.display="none";
         document.getElementById("div4").style.display="none";
         document.getElementById("div5").style.display="none";
-
-
     }
-
 
 </script>
 </html>
