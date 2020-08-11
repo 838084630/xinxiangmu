@@ -12,12 +12,13 @@
         background-color: rgba(255, 255, 255, 0.8);
         width: 600px;
         height: 400px;
-        border-radius:20px;
+        border-radius: 20px;
         left: 600px;
         top: 200px;
         position: absolute;
     }
-    h2{
+
+    h2 {
         color: white;
     }
 
@@ -44,7 +45,15 @@
                        style="display:inline;width:200px;"
                        autocomplete="off" placeholder="请输入密码"/>
             </div>
-            <button type="button" class="btn btn-primary " id="button_submit" style="margin-left: 200px">登录<span class="glyphicon glyphicon-log-in"></span></button>
+            <div class="form-group" id="imgCode">
+                <label for="code" style="display:inline;"><span class="glyphicon glyphicon glyphicon-asterisk"
+                                                                aria-hidden="true"></span>验证码:</label>
+                <input type="text" placeholder="请输入验证码" name="code" autocomplete="off" id="code" class="form-control"
+                       style="display:inline;width:200px;">
+                <img src="/getCode" onclick="this.src=this.src+'?'">
+            </div>
+            <button type="button" class="btn btn-primary " id="button_submit" style="margin-left: 200px">登录<span
+                    class="glyphicon glyphicon-log-in"></span></button>
             <div id="result"></div>
 
         </form>
@@ -52,14 +61,14 @@
 </div>
 </body>
 <script>
-    // function login() {
-    //     $.ajax({
-    //         url:"/",
-    //         success:function (data) {
-    //
-    //         }
-    //     })
-    // }
+    function getCode() {
+        $.ajax({
+            url: "/getCode",
+            success: function (data) {
+
+            }
+        })
+    }
 
     $("#button_submit").click(function () {
         //序列化表单元素，返回json数据
@@ -67,36 +76,44 @@
 
         //也可以把表单之外的元素按照name value的格式存进来
         //params.push({name:"hello",value:"man"});
+        if ($("#code").val()!=""){
+            $.ajax({
+                type: "POST",
+                url: "/adminLogin",
+                data: {
+                    adminName: $("#user").val(),
+                    adminPass: $("#password").val(),
+                    code: $("#code").val()
+                },
+                success: function (data) {
+                    if (data["code"] == "200") {
+                        var username = data["name"];
+                        var level = data["level"];
+                        $("#result").html("");
+                        alert("欢迎" + username);
+                        if (level == 0) {
 
-        $.ajax({
-            type: "POST",
-            url: "/adminLogin",
-            data: {
-                adminName: $("#user").val(),
-                adminPass: $("#password").val()
-            },
-            success: function (data) {
-                if (data["code"] == "200") {
-                    var username = data["name"];
-                    var level = data["level"];
-                    $("#result").html("");
-                    alert("欢迎" + username);
-                    if (level == 0) {
+                            window.location.href = 'trainPage?username=' + username;
 
-                        window.location.href = 'trainPage?username=' + username;
+                        } else {
 
-                    } else {
+                            window.location.href = 'signUp?username=' + username;
 
-                        window.location.href = 'signUp?username=' + username;
-
+                        }
+                    }
+                    if (data["code"] == "400") {
+                        $("#result").html("用户名或密码错误").css("color", "red");
+                    }
+                    if (data["code"] == "401"){
+                        $("#result").html("验证码错误").css("color", "red");
                     }
                 }
-                if (data["code"] == "400") {
-                    $("#result").html("用户名或密码错误").css("color", "red");
-                }
-            }
 
-        });
+            });
+        }else {
+            $("#result").html("请输入验证码").css("color", "red");
+        }
+
     });
 
 </script>
